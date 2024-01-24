@@ -1,1 +1,72 @@
+syntax "ansible" "\.ya?ml$"
+#comment "#"
+header "^---$"
+magic "^---$"
 
+## Keys
+# color magenta "(^|\s).*:"
+color magenta "^\s*[\$A-Za-z0-9_\.-]+\:"
+color brightmagenta "^\s*@[\$A-Za-z0-9_\.-]+\:"
+
+## Values
+color white ":\s.+$"
+
+## Numbers
+color brightred " [[:digit:]]+(\.[[:digit:]]+)?"
+
+## Booleans $TRUE
+icolor brightgreen " (y|yes|true|on|1)$"
+
+## Booleans $FALSE
+icolor brightred " (n|no|false|off|0)$"
+
+## Arrays
+color red "\[" "\]" ":\s+[|>]"
+
+## Reserved
+color green "(^| )!!(binary|bool|float|int|map|null|omap|seq|set|str) "
+
+## Separator
+#color blue "^-\s.*:"
+#color blue "^\s+-.*:"
+#color blue "^-\s.*([^[]):"
+#color blue "^\s+-.*([^[]):"
+color blue "(\-)\s*[\$A-Za-z0-9_\.-]+\:"
+color blue "(\-)\s*@[\$A-Za-z0-9_\.-]+\:"
+color brightwhite ":(\s|\t|$)" "^\s*- "
+
+## Errors
+#color ,red ":\w.+$"
+color ,red ":[a-zA-Z].+$"
+color ,red ":'.+$"
+color ,red ":".+$"
+color ,red "\s+$"
+
+## Closed quotes
+#color yellow "['"]([^"])+?['"]"
+color yellow "[']([^'])+?[']"
+color yellow "["]([^"])+?["]"
+
+## Closed {{ ansible_vars }} - improper spacing
+color brightblue,red "[\{]\{([^\}\}])+?}[\}]"
+
+## Closed {{ansible_vars  }} - proper spacing
+color brightblue "[\{]\{\s\S([^\}\}])+?\S\s}[\}]"
+
+## Non closed {{ ansible_vars }}
+color ,red "[\{]\{([^}])+?[^}]*$"
+color ,red "[\{]\{([^}])+?\}[^}]*$"
+
+## Non closed quote
+#color ,red "['"]([^"'])+?[^['"]]*$"
+#color ,red "[']([^"])+?[^[']]"
+#color ,red "["]([^'])+?[^["]]"
+
+## Trailing whitespace
+color ,red "[[:space:]]+$"
+
+## Equal Sign
+color brightgreen "=( |$)"
+
+## Comments
+color brightblue "(^|[[:space:]])#.*$"
