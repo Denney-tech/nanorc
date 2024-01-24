@@ -37,17 +37,17 @@ icolor brightcyan "\$\{[a-zA-Z0-9_:]+\}"
 color lightblack "(\.|,|;|:|\{|\}|\(|\)|.=\s|\s.=\s|\s-\s)"
 color white "(\{|\}|\(|\)|\[|\])"
 
-## Text between %'s and @'s
+## Text between %'s
 icolor brightmagenta "\%[^\%]*\%"
-icolor blue start="@\"" end="\"@"
-
-## Quoted text
-color blue "\"[^\"]*\""
-color blue "'[^']*'"
 
 ## Comments
 color green "#.*$"
 color green start="<#" end="#>"
+
+## Quoted text
+color blue "\"[^\"]*\""
+color blue "'[^']*'"
+icolor blue start="@\"" end="\"@"
 
 ## Trailing whitespace
 color ,red "[[:space:]]+$"
