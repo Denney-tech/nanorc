@@ -26,13 +26,6 @@ icolor lightblack "\s-\w+"
 # numbers
 color brightwhite "[0-9]"
 
-## Variables
-icolor white "\$[a-zA-Z0-9_:]+[a-zA-Z0-9_:\.]+"
-icolor white "\$\{[a-zA-Z0-9_:]+\}[a-zA-Z0-9_:\.]+"
-icolor brightcyan "\$\("
-icolor brightcyan "\$[a-zA-Z0-9_:]+"
-icolor brightcyan "\$\{[a-zA-Z0-9_:]+\}"
-
 # punctuation
 color lightblack "(\.|,|;|:|\{|\}|\(|\)|.=\s|\s.=\s|\s-\s)"
 color white "(\{|\}|\(|\)|\[|\])"
@@ -44,10 +37,20 @@ icolor brightmagenta "\%[^\%]*\%"
 color green "#.*$"
 color green start="<#" end="#>"
 
-## Quoted text
+## Quoted Strings
 color blue "\"[^\"]*\""
+color blue start="@\"" end="\"@"
+
+## Variables
+icolor white "\$[a-zA-Z0-9_:]+[a-zA-Z0-9_:\.]+"
+icolor white "\$\{[a-zA-Z0-9_:]+\}[a-zA-Z0-9_:\.]+"
+icolor brightcyan "\$\("
+icolor brightcyan "\$[a-zA-Z0-9_:]+"
+icolor brightcyan "\$\{[a-zA-Z0-9_:]+\}"
+
+## Quoted Strings - Literal
 color blue "'[^']*'"
-icolor blue start="@\"" end="\"@"
+color blue start="@'" end="'@"
 
 ## Trailing whitespace
 color ,red "[[:space:]]+$"
