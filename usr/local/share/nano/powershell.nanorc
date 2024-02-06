@@ -3,17 +3,30 @@
 
 syntax "PowerShell" "\.[pP][sS][1]$" "\.[pP][sS][mM][1]$"
 
-# Unquoted text is not necessarily treated as strings, and could be seen as a cmdlet/function/binary command.
-# Highlight all text first, then narrow in on specifics.
+## Unquoted text is not necessarily treated as strings, and could be seen as a cmdlet/function/binary command.
+## Highlight all text first, then narrow in on specifics.
 icolor brightyellow ".*"
+
+## paths
+icolor white "/(\w|/)+"
+
+## Dictionary Keys
+color brightcyan "\w+.\="
+color brightcyan ".\="
+
+## punctuation
+#color lightblack "(\.|,|;|:|\=|\+|\-|\*|\/)"
+color white "(\.|,|;|:|\=|\+|\-|\*|\/)"
+color white "(\{|\}|\(|\)|\[|\]|\|)"
 
 ## Statements
 icolor white "\<(using|hidden|class|param|if|do|else|elseif|for|foreach|switch|until|while|return|break|exit|throw|try|catch|finally)\>.*"
 icolor magenta "\<(using|hidden|class|param|if|do|else|elseif|for|foreach|switch|until|while|return|break|exit|throw|try|catch|finally)\>"
+color magenta "\%"
 
 ## Commands - All valid verb-nouns
-icolor white "\<(Add|Clear|Close|Copy|Enter|Exit|Find|Format|Get|Hide|Join|Lock|Move|New|Open|Optimize|Push|Pop|Redo|Remove|Rename|Reset|Resize|Search|Select|Set|Show|Skip|Split|Step|Switch|Undo|Unlock|Watch|Connect|Disconnect|Read|Receive|Send|Write|Backup|Checkpoint|Compare|Compress|Convert|ConvertFrom|ConvertTo|Dismount|Edit|Expand|Export|Group|Import|Initialize|Limit|Merge|Mount|Out|Publish|Restore|Save|Sync|Unpublish|Update|Debug|Measure|Ping|Repair|Resolve|Test|Trace|Approve|Assert|Build|Complete|Confirm|Deny|Deploy|Disable|Enable|Install|Invoke|Register|Request|Restart|Resume|Start|Stop|Submit|Suspend|Uninstall|Unregister|Wait|Use|Block|Grant|Protect|Revoke|Unblock|Unprotect)-.*\>"
-icolor brightyellow "\<(Add|Clear|Close|Copy|Enter|Exit|Find|Format|Get|Hide|Join|Lock|Move|New|Open|Optimize|Push|Pop|Redo|Remove|Rename|Reset|Resize|Search|Select|Set|Show|Skip|Split|Step|Switch|Undo|Unlock|Watch|Connect|Disconnect|Read|Receive|Send|Write|Backup|Checkpoint|Compare|Compress|Convert|ConvertFrom|ConvertTo|Dismount|Edit|Expand|Export|Group|Import|Initialize|Limit|Merge|Mount|Out|Publish|Restore|Save|Sync|Unpublish|Update|Debug|Measure|Ping|Repair|Resolve|Test|Trace|Approve|Assert|Build|Complete|Confirm|Deny|Deploy|Disable|Enable|Install|Invoke|Register|Request|Restart|Resume|Start|Stop|Submit|Suspend|Uninstall|Unregister|Wait|Use|Block|Grant|Protect|Revoke|Unblock|Unprotect)-\w+\>"
+icolor white "\<(Add|Clear|Close|Copy|Enter|Exit|Find|Format|Get|Hide|Join|Lock|Move|New|Open|Optimize|Push|Pop|Redo|Remove|Rename|Reset|Resize|Search|Select|Set|Show|Skip|Split|Step|Switch|Und$
+icolor brightyellow "\<(Add|Clear|Close|Copy|Enter|Exit|Find|Format|Get|Hide|Join|Lock|Move|New|Open|Optimize|Push|Pop|Redo|Remove|Rename|Reset|Resize|Search|Select|Set|Show|Skip|Split|Step|Swi$
 
 ## Functions
 icolor cyan "\<^function\>"
@@ -21,14 +34,12 @@ icolor brightblue "\[.*\]"
 icolor brightblue "\[.*\]::\w+"
 
 ## Comparison operators or args
-icolor lightblack "\s-\w+"
+#icolor lightblack "\s-\w+"
+icolor white "\s-\w+"
 
-# numbers
+## numbers
 color brightwhite "[0-9]"
 
-# punctuation
-color lightblack "(\.|,|;|:|\{|\}|\(|\)|.=\s|\s.=\s|\s-\s)"
-color white "(\{|\}|\(|\)|\[|\])"
 
 ## Text between %'s
 icolor brightmagenta "\%[^\%]*\%"
@@ -37,18 +48,20 @@ icolor brightmagenta "\%[^\%]*\%"
 color green "#.*$"
 color green start="<#" end="#>"
 
-## Quoted Strings
+## Quoted String
 color blue "\"[^\"]*\""
 color blue start="@\"" end="\"@"
 
 ## Variables
+icolor brightcyan start="\$\(" end="\)"
 icolor white "\$[a-zA-Z0-9_:]+[a-zA-Z0-9_:\.]+"
 icolor white "\$\{[a-zA-Z0-9_:]+\}[a-zA-Z0-9_:\.]+"
 icolor brightcyan "\$\("
 icolor brightcyan "\$[a-zA-Z0-9_:]+"
-icolor brightcyan "\$\{[a-zA-Z0-9_:]+\}"
+icolor brightcyan start="\$\{" end="\}"
+icolor brightcyan "@"
 
-## Quoted Strings - Literal
+## Quoted String - Literal
 color blue "'[^']*'"
 color blue start="@'" end="'@"
 
