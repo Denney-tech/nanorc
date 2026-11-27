@@ -62,8 +62,8 @@ icolor #59d "\$null\>"
 ## Single-quoted strings are literal: no variables inside
 color #c97 "'([^']|'')*'"
 
-## Whole-line comments (after strings, so commented-out code stays comment-colored), block
-## comments, comment-based help keywords, #region and #Requires
+## Whole-line comments (after strings, so commented-out code stays comment-colored),
+## #region and #Requires
 color italic,#695 "^[[:space:]]*#.*$"
 icolor bold,italic,#695 "^[[:space:]]*#(region|endregion)\>.*$"
 icolor bold,#c8c "^[[:space:]]*#requires\>.*$"
