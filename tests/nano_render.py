@@ -249,6 +249,9 @@ def render(rcfile, path: str, settle: float = 1.0, timeout: float = 20.0) -> Scr
     if pid == 0:
         fcntl.ioctl(0, termios.TIOCSWINSZ, struct.pack("HHHH", ROWS, COLS, 0, 0))
         os.environ["TERM"] = "xterm-256color"
+        # English messages (the tests match nano's rc diagnostics), UTF-8 for the screen
+        os.environ["LC_ALL"] = "C.UTF-8"
+        os.environ.pop("LANGUAGE", None)
         os.environ.pop("NO_COLOR", None)
         rc_args = ["--rcfile", rcfile] if rcfile else []
         os.execvp("nano", ["nano", *rc_args, "--view", path])

@@ -9,5 +9,8 @@ function Get-Thing {
   if ($true -and -not $false) { Get-ChildItem -Path $Path | ForEach-Object { $_.Name.Trim() } }
   $msg = "Found $Count items in ${Path}"
   $tag = "Issue #1"
+  $text = @"
+# literal text
+"@
   [Math]::Round(3.14) ; $null = $env:HOME  # trailing comment
 }

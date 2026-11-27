@@ -161,6 +161,7 @@ class Highlighting(unittest.TestCase):
             ("$Count", "variable", 2),          # inside a double-quoted string
             ("${Path}", "variable"),
             ('"Issue #1"', "string"),         # "#" inside a string is not a comment
+            ("# literal text", "string"),     # ...nor inside a here-string
             ("[Math]", "type"),
             ("::Round", "command"),
             ("$null", "declaration"),
@@ -173,6 +174,9 @@ class Highlighting(unittest.TestCase):
             ("# Module manifest", "comment"),
             ("RootModule", "variable"),
             ("'Sample.psm1'", "string"),
+            ("'Tag #1'", "string"),
+            ("# a real comment", "comment"),
+            ("# not a comment", "string"),    # inside a here-string
             ("7.4", "number"),
             ("'Get-Thing'", "string"),         # a string here, not a command
             ('"Set-Thing"', "string"),

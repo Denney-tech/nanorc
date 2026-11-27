@@ -47,7 +47,6 @@ color italic,#695 "[[:space:]]#.*$"
 
 ## Double-quoted strings (variables inside are repainted below, as VS Code does)
 color #c97 "\"([^\"`]|`.)*\""
-color #c97 start="@\"$" end="^\"@"
 
 ## Variables: $name, $script:name, $env:PATH, ${odd name}, @splat
 color #9df "\$[[:alnum:]_?]+(:[[:alnum:]_]+)?"
@@ -62,7 +61,6 @@ icolor #59d "\$null\>"
 
 ## Single-quoted strings are literal: no variables inside
 color #c97 "'([^']|'')*'"
-color #c97 start="@'$" end="^'@"
 
 ## Whole-line comments (after strings, so commented-out code stays comment-colored), block
 ## comments, comment-based help keywords, #region and #Requires
@@ -71,6 +69,11 @@ color italic,#695 start="<#" end="#>"
 icolor bold,italic,#695 "^[[:space:]]*\.(SYNOPSIS|DESCRIPTION|PARAMETER|EXAMPLE|INPUTS|OUTPUTS|NOTES|LINK|COMPONENT|ROLE|FUNCTIONALITY|FORWARDHELPTARGETNAME|FORWARDHELPCATEGORY|REMOTEHELPRUNSPACE|EXTERNALHELP)\>"
 icolor bold,italic,#695 "^[[:space:]]*#(region|endregion)\>.*$"
 icolor bold,#c8c "^[[:space:]]*#requires\>.*$"
+
+## Here-strings last, so lines inside them that look like comments stay string-colored
+## (variables inside @" "@ show as plain string text)
+color #c97 start="@\"$" end="^\"@"
+color #c97 start="@'$" end="^'@"
 
 ## Errors: trailing whitespace
 color ,red "[[:space:]]+$"
@@ -88,11 +91,11 @@ color normal "="
 ## Numbers and versions: 0.1.0, 7.4
 color #bca "\<[[:digit:]]+(\.[[:digit:]]+)*\>"
 
+## Trailing comments before strings, so a "#" inside a string stays string-colored
+color italic,#695 "[[:space:]]#.*$"
 ## Strings
 color #c97 "\"([^\"`]|`.)*\""
 color #c97 "'([^']|'')*'"
-color #c97 start="@\"$" end="^\"@"
-color #c97 start="@'$" end="^'@"
 
 ## The few variables data files allow
 icolor green "\$true\>"
@@ -100,9 +103,13 @@ icolor red "\$false\>"
 icolor #59d "\$null\>"
 icolor #4cf "\$(PSScriptRoot|PSCulture|PSUICulture|PSEdition)\>"
 
-## Comments
-color italic,#695 "(^|[[:space:]])#.*$"
+## Whole-line and block comments
+color italic,#695 "^[[:space:]]*#.*$"
 color italic,#695 start="<#" end="#>"
+
+## Here-strings last, so lines inside them that look like comments stay string-colored
+color #c97 start="@\"$" end="^\"@"
+color #c97 start="@'$" end="^'@"
 
 ## Errors: trailing whitespace
 color ,red "[[:space:]]+$"
