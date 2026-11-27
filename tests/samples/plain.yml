@@ -1,0 +1,18 @@
+%YAML 1.2
+---
+# compose-style file, not Ansible
+services:
+  web:
+    image: nginx:1.27
+    command: nginx -g 'daemon off;'
+    user: www
+    replicas: 2
+    enabled: true
+    debug: off
+    extra: null
+    anchors: &base
+      key: value
+    merged: *base
+    script: |
+      echo hi
+    tagged: !!str 123
