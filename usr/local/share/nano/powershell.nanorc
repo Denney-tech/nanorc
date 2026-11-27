@@ -1,69 +1,119 @@
-## Nano syntax highlighting file for PowerShell
+## Nano syntax highlighting for PowerShell
 ## Written by Caleb Denney https://github.com/Denney-tech
+##
+## Colors follow VS Code's Dark+ theme, with Ansible-style status colors:
+## green = true/ok, red = false/error, yellow = warning (see README.md).
+## Rules are applied in order, and later rules repaint earlier ones.
 
-syntax "PowerShell" "\.[pP][sS][1]$" "\.[pP][sS][mM][1]$"
+## --- Scripts and modules -------------------------------------------------------------------
+syntax powershell "\.[pP][sS]([mM])?1$"
+header "^#!.*pwsh"
+comment "#"
 
-## Unquoted text is not necessarily treated as strings, and could be seen as a cmdlet/function/binary command.
-## Highlight all text first, then narrow in on specifics.
-icolor brightyellow ".*"
+## Parameters: -Path, -Recurse
+color #9ab "\B-[[:alpha:]][[:alnum:]_]*"
 
-## paths
-icolor white "/(\w|/)+"
+## Operators: -eq, -like, -match, -and, -f ... (plain, as in VS Code)
+icolor normal "\B-[ci]?(eq|ne|gt|ge|lt|le|like|notlike|match|notmatch|contains|notcontains|in|notin|replace|split|is|isnot|as)\>"
+icolor normal "\B-(and|or|xor|not|band|bor|bxor|bnot|shl|shr|join|f)\>"
 
-## Dictionary Keys
-color brightcyan "\w+.\="
-color brightcyan ".\="
+## Numbers: 42, 3.14, 0x1F, 1e3, 10KB
+icolor #bca "\<(0x[[:xdigit:]]+|[[:digit:]]+(\.[[:digit:]]+)?(e[+-]?[[:digit:]]+)?)(kb|mb|gb|tb|pb|l|d|u|ul|n|y|s)?\>"
 
-## punctuation
-#color lightblack "(\.|,|;|:|\=|\+|\-|\*|\/)"
-color white "(\.|,|;|:|\=|\+|\-|\*|\/)"
-color white "(\{|\}|\(|\)|\[|\]|\|)"
+## Declarations
+icolor #59d "\<(function|filter|workflow|configuration|param|begin|process|end|clean|dynamicparam|class|enum|using|namespace|module|hidden|static|data)\>"
 
-## Statements
-icolor white "\<(using|hidden|class|param|if|do|else|elseif|for|foreach|switch|until|while|return|break|exit|throw|try|catch|finally)\>.*"
-icolor magenta "\<(using|hidden|class|param|if|do|else|elseif|for|foreach|switch|until|while|return|break|exit|throw|try|catch|finally)\>"
-color magenta "\%"
+## Control flow
+icolor #c8c "\<(if|elseif|else|switch|foreach|for|while|do|until|break|continue|return|exit|throw|try|catch|finally|trap|in)\>"
 
-## Commands - All valid verb-nouns
-icolor white "\<(Add|Clear|Close|Copy|Enter|Exit|Find|Format|Get|Hide|Join|Lock|Move|New|Open|Optimize|Push|Pop|Redo|Remove|Rename|Reset|Resize|Search|Select|Set|Show|Skip|Split|Step|Switch|Undo|Unlock|Watch|Connect|Disconnect|Read|Receive|Send|Write|Backup|Checkpoint|Compare|Compress|Convert|ConvertFrom|ConvertTo|Dismount|Edit|Expand|Export|Group|Import|Initialize|Limit|Merge|Mount|Out|Publish|Restore|Save|Sync|Unpublish|Update|Debug|Measure|Ping|Repair|Resolve|Test|Trace|Approve|Assert|Build|Complete|Confirm|Deny|Deploy|Disable|Enable|Install|Invoke|Register|Request|Restart|Resume|Start|Stop|Submit|Suspend|Uninstall|Unregister|Wait|Use|Block|Grant|Protect|Revoke|Unblock|Unprotect)-.*\>"
-icolor brightyellow "\<(Add|Clear|Close|Copy|Enter|Exit|Find|Format|Get|Hide|Join|Lock|Move|New|Open|Optimize|Push|Pop|Redo|Remove|Rename|Reset|Resize|Search|Select|Set|Show|Skip|Split|Step|Switch|Undo|Unlock|Watch|Connect|Disconnect|Read|Receive|Send|Write|Backup|Checkpoint|Compare|Compress|Convert|ConvertFrom|ConvertTo|Dismount|Edit|Expand|Export|Group|Import|Initialize|Limit|Merge|Mount|Out|Publish|Restore|Save|Sync|Unpublish|Update|Debug|Measure|Ping|Repair|Resolve|Test|Trace|Approve|Assert|Build|Complete|Confirm|Deny|Deploy|Disable|Enable|Install|Invoke|Register|Request|Restart|Resume|Start|Stop|Submit|Suspend|Uninstall|Unregister|Wait|Use|Block|Grant|Protect|Revoke|Unblock|Unprotect)-\w+\>"
+## Commands: approved Verb-Noun names (after keywords, so ForEach-Object is one command)
+icolor #dda "\<(Add|Approve|Assert|Backup|Block|Build|Checkpoint|Clear|Close|Compare|Complete|Compress|Confirm|Connect|Convert|ConvertFrom|ConvertTo|Copy|Debug|Deny|Deploy|Disable|Disconnect|Dismount|Edit|Enable|Enter|Exit|Expand|Export|Find|ForEach|Format|Get|Grant|Group|Hide|Import|Initialize|Install|Invoke|Join|Limit|Lock|Measure|Merge|Mount|Move|New|Open|Optimize|Out|Ping|Pop|Protect|Publish|Push|Read|Receive|Redo|Register|Remove|Rename|Repair|Request|Reset|Resize|Resolve|Restart|Restore|Resume|Revoke|Save|Search|Select|Send|Set|Show|Skip|Sort|Split|Start|Step|Stop|Submit|Suspend|Switch|Sync|Tee|Test|Trace|Unblock|Undo|Uninstall|Unlock|Unprotect|Unpublish|Unregister|Update|Use|Wait|Watch|Where|Write)-[[:alnum:]_]+\>"
 
-## Functions
-icolor cyan "\<^function\>"
-icolor brightblue "\[.*\]"
-icolor brightblue "\[.*\]::\w+"
+## The name in a function definition
+icolor #dda "\<function[[:space:]]+[[:alnum:]_:.-]+"
+icolor #59d "\<function\>"
 
-## Comparison operators or args
-#icolor lightblack "\s-\w+"
-icolor white "\s-\w+"
+## Types and attributes: [string], [List[int]], [System.IO.File], [Parameter(Mandatory)]
+color #4cb "\[[[:alpha:]][[:alnum:]_.]*(\[[[:alnum:]_., ]*\])?\]"
+color #4cb "\[[[:alpha:]][[:alnum:]_.]*\("
 
-## numbers
-color brightwhite "[0-9]"
+## Static and instance method calls: [Math]::Round(...), $x.Trim()
+color #dda "::[[:alpha:]][[:alnum:]_]*"
+color #dda "\.[[:alpha:]][[:alnum:]_]*\("
+color normal "\("
+
+## Trailing comments, painted before strings so a "#" inside a string stays string-colored
+color italic,#695 "[[:space:]]#.*$"
+
+## Double-quoted strings (variables inside are repainted below, as VS Code does)
+color #c97 "\"([^\"`]|`.)*\""
+
+## Variables: $name, $script:name, $env:PATH, ${odd name}, @splat
+color #9df "\$[[:alnum:]_?]+(:[[:alnum:]_]+)?"
+color #9df "\$\{[^}]*\}"
+color #9df "@[[:alpha:]_][[:alnum:]_]*"
+## Automatic variables
+icolor #4cf "\$(_|args|this|input|PSItem|PSScriptRoot|PSCommandPath|MyInvocation|PSBoundParameters|PSCmdlet|LASTEXITCODE|Error|Host|HOME|PID|PWD|PSVersionTable|ExecutionContext|Matches|IsLinux|IsWindows|IsMacOS)\>"
+## Status constants: $true = ok (green), $false = red, $null as a constant
+icolor green "\$true\>"
+icolor red "\$false\>"
+icolor #59d "\$null\>"
+
+## Single-quoted strings are literal: no variables inside
+color #c97 "'([^']|'')*'"
+
+## Whole-line comments (after strings, so commented-out code stays comment-colored),
+## #region and #Requires
+color italic,#695 "^[[:space:]]*#.*$"
+icolor bold,italic,#695 "^[[:space:]]*#(region|endregion)\>.*$"
+icolor bold,#c8c "^[[:space:]]*#requires\>.*$"
+
+## Here-strings after line comments, so "# ..." lines inside them stay string-colored
+## (variables inside @" "@ show as plain string text)
+color #c97 start="@\"$" end="^\"@"
+color #c97 start="@'$" end="^'@"
+
+## Block comments after here-strings, so a here-string example inside <# #> (common in
+## comment-based help) stays comment-colored. nano can't scope a rule to inside or outside a
+## region, so a "<#" inside a here-string starts a comment: rare in real scripts.
+color italic,#695 start="<#" end="#>"
+icolor bold,italic,#695 "^[[:space:]]*\.(SYNOPSIS|DESCRIPTION|PARAMETER|EXAMPLE|INPUTS|OUTPUTS|NOTES|LINK|COMPONENT|ROLE|FUNCTIONALITY|FORWARDHELPTARGETNAME|FORWARDHELPCATEGORY|REMOTEHELPRUNSPACE|EXTERNALHELP)\>"
+
+## Errors: trailing whitespace
+color ,red "[[:space:]]+$"
 
 
-## Text between %'s
-icolor brightmagenta "\%[^\%]*\%"
+## --- Data files: module manifests and .psd1 data -------------------------------------------
+## A restricted language: hashtables and arrays of literals, so no command or keyword colors.
+syntax powershell-data "\.[pP][sS][dD]1$"
+comment "#"
 
-## Comments
-color green "#.*$"
-color green start="<#" end="#>"
+## Keys: Name = ...
+color #9df "^[[:space:]]*[[:alpha:]_][[:alnum:]_.]*[[:space:]]*="
+color normal "="
 
-## Quoted String
-color blue "\"[^\"]*\""
-color blue start="@\"" end="\"@"
+## Numbers and versions: 0.1.0, 7.4
+color #bca "\<[[:digit:]]+(\.[[:digit:]]+)*\>"
 
-## Variables
-icolor brightcyan start="\$\(" end="\)"
-icolor white "\$[a-zA-Z0-9_:]+[a-zA-Z0-9_:\.]+"
-icolor white "\$\{[a-zA-Z0-9_:]+\}[a-zA-Z0-9_:\.]+"
-icolor brightcyan "\$\("
-icolor brightcyan "\$[a-zA-Z0-9_:]+"
-icolor brightcyan start="\$\{" end="\}"
-icolor brightcyan "@"
+## Trailing comments before strings, so a "#" inside a string stays string-colored
+color italic,#695 "[[:space:]]#.*$"
+## Strings
+color #c97 "\"([^\"`]|`.)*\""
+color #c97 "'([^']|'')*'"
 
-## Quoted String - Literal
-color blue "'[^']*'"
-color blue start="@'" end="'@"
+## The few variables data files allow
+icolor green "\$true\>"
+icolor red "\$false\>"
+icolor #59d "\$null\>"
+icolor #4cf "\$(PSScriptRoot|PSCulture|PSUICulture|PSEdition)\>"
 
-## Trailing whitespace
+## Whole-line comments
+color italic,#695 "^[[:space:]]*#.*$"
+
+## Here-strings after line comments, block comments after here-strings (see above)
+color #c97 start="@\"$" end="^\"@"
+color #c97 start="@'$" end="^'@"
+color italic,#695 start="<#" end="#>"
+
+## Errors: trailing whitespace
 color ,red "[[:space:]]+$"
