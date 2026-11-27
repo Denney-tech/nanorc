@@ -2,6 +2,10 @@
 <#
 .SYNOPSIS
   Does a thing.
+.EXAMPLE
+  $value = @"
+  documented text
+"@
 #>
 function Get-Thing {
   [CmdletBinding()]

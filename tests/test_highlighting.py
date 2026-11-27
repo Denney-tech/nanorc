@@ -141,6 +141,8 @@ class Highlighting(unittest.TestCase):
         self.check("sample.ps1", [
             ("#Requires -Version 7.4", "directive"),
             (".SYNOPSIS", "help"),
+            (".EXAMPLE", "help"),
+            ("documented text", "comment"),   # a here-string example inside <# #> stays a comment
             ("function", "declaration"),
             ("Get-Thing", "command"),
             ("[CmdletBinding", "type"),

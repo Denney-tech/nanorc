@@ -65,15 +65,19 @@ color #c97 "'([^']|'')*'"
 ## Whole-line comments (after strings, so commented-out code stays comment-colored), block
 ## comments, comment-based help keywords, #region and #Requires
 color italic,#695 "^[[:space:]]*#.*$"
-color italic,#695 start="<#" end="#>"
-icolor bold,italic,#695 "^[[:space:]]*\.(SYNOPSIS|DESCRIPTION|PARAMETER|EXAMPLE|INPUTS|OUTPUTS|NOTES|LINK|COMPONENT|ROLE|FUNCTIONALITY|FORWARDHELPTARGETNAME|FORWARDHELPCATEGORY|REMOTEHELPRUNSPACE|EXTERNALHELP)\>"
 icolor bold,italic,#695 "^[[:space:]]*#(region|endregion)\>.*$"
 icolor bold,#c8c "^[[:space:]]*#requires\>.*$"
 
-## Here-strings last, so lines inside them that look like comments stay string-colored
+## Here-strings after line comments, so "# ..." lines inside them stay string-colored
 ## (variables inside @" "@ show as plain string text)
 color #c97 start="@\"$" end="^\"@"
 color #c97 start="@'$" end="^'@"
+
+## Block comments after here-strings, so a here-string example inside <# #> (common in
+## comment-based help) stays comment-colored. nano can't scope a rule to inside or outside a
+## region, so a "<#" inside a here-string starts a comment: rare in real scripts.
+color italic,#695 start="<#" end="#>"
+icolor bold,italic,#695 "^[[:space:]]*\.(SYNOPSIS|DESCRIPTION|PARAMETER|EXAMPLE|INPUTS|OUTPUTS|NOTES|LINK|COMPONENT|ROLE|FUNCTIONALITY|FORWARDHELPTARGETNAME|FORWARDHELPCATEGORY|REMOTEHELPRUNSPACE|EXTERNALHELP)\>"
 
 ## Errors: trailing whitespace
 color ,red "[[:space:]]+$"
@@ -103,13 +107,13 @@ icolor red "\$false\>"
 icolor #59d "\$null\>"
 icolor #4cf "\$(PSScriptRoot|PSCulture|PSUICulture|PSEdition)\>"
 
-## Whole-line and block comments
+## Whole-line comments
 color italic,#695 "^[[:space:]]*#.*$"
-color italic,#695 start="<#" end="#>"
 
-## Here-strings last, so lines inside them that look like comments stay string-colored
+## Here-strings after line comments, block comments after here-strings (see above)
 color #c97 start="@\"$" end="^\"@"
 color #c97 start="@'$" end="^'@"
+color italic,#695 start="<#" end="#>"
 
 ## Errors: trailing whitespace
 color ,red "[[:space:]]+$"
