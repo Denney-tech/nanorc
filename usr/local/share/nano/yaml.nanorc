@@ -1,0 +1,89 @@
+## Nano syntax highlighting for YAML, and Ansible YAML (playbooks, roles, inventories)
+## Written by Caleb Denney https://github.com/Denney-tech
+##
+## Colors follow VS Code's Dark+ theme, with Ansible-style status colors:
+## green = true/ok, red = false/error, yellow = warning (see README.md).
+## Rules are applied in order, and later rules repaint earlier ones.
+##
+## Both syntaxes live in this one file on purpose: when several syntaxes match a file, nano
+## uses the one defined last, so "ansible" must come after "yaml".
+
+## --- Plain YAML ----------------------------------------------------------------------------
+syntax yaml "\.ya?ml$" "(^|/)\.(clang-format|clang-tidy|yamllint)$"
+header "^%YAML"
+comment "#"
+
+## Plain (unquoted) values are strings
+color #c97 "(:|^[[:space:]]*-)[[:space:]]+[^[:space:]#][^#]*"
+## Keys
+color #59d "^[[:space:]]*(-[[:space:]]+)*[^[:space:]#'\"{}[,&*!|>%@`-][^#]*:([[:space:]]|$)"
+color #59d "^[[:space:]]*(-[[:space:]]+)*-[^[:space:]#][^#]*:([[:space:]]|$)"
+## Numbers, booleans (true = ok/green, false = red) and null as whole values
+icolor #bca "(:|-)[[:space:]]+[-+]?(0x[[:xdigit:]]+|0o[0-7]+|[[:digit:]]+(\.[[:digit:]]*)?(e[-+]?[[:digit:]]+)?|\.inf|\.nan)[[:space:]]*(#.*)?$"
+icolor green "(:|-)[[:space:]]+(true|yes|on)[[:space:]]*(#.*)?$"
+icolor red "(:|-)[[:space:]]+(false|no|off)[[:space:]]*(#.*)?$"
+icolor #59d "(:|-)[[:space:]]+(null|~)[[:space:]]*(#.*)?$"
+## Punctuation
+color normal ":([[:space:]]|$)" "^[[:space:]]*(-[[:space:]]+)+" "[][{},]"
+## Quoted strings
+color #c97 "\"([^\"\\]|\\.)*\"" "'([^']|'')*'"
+## Anchors, aliases and tags
+color #4cb "(^|[[:space:]])[&*][[:alnum:]_.-]+" "(^|[[:space:]])![[:alnum:]!_/.:-]*"
+## Block scalar indicators: | > |- >+
+color #c8c ":[[:space:]]+[|>][-+0-9]*[[:space:]]*(#.*)?$"
+color normal ":[[:space:]]"
+## Document markers and directives
+color #888 "^(---|\.\.\.)([[:space:]]|$)" "^%.*$"
+## Comments
+color italic,#695 "(^|[[:space:]])#.*$"
+## Errors: tabs in indentation (not allowed in YAML) and trailing whitespace
+color ,red "^[[:space:]]*	[[:space:]]*"
+color ,red "[[:space:]]+$"
+
+
+## --- Ansible -------------------------------------------------------------------------------
+## Files in the usual Ansible locations, or with "ansible" or "playbook" in their path.
+syntax ansible "(^|/)(tasks|handlers|vars|defaults|meta|group_vars|host_vars|inventory|inventories|playbooks?|roles|molecule)/.*\.ya?ml$" "(^|/)[^/]*(ansible|playbook)[^/]*(/.*)?\.ya?ml$" "(^|/)(site|requirements|galaxy)\.ya?ml$" "(^|/)\.ansible-lint$"
+comment "#"
+
+## Same base as plain YAML
+color #c97 "(:|^[[:space:]]*-)[[:space:]]+[^[:space:]#][^#]*"
+color #59d "^[[:space:]]*(-[[:space:]]+)*[^[:space:]#'\"{}[,&*!|>%@`-][^#]*:([[:space:]]|$)"
+color #59d "^[[:space:]]*(-[[:space:]]+)*-[^[:space:]#][^#]*:([[:space:]]|$)"
+icolor #bca "(:|-)[[:space:]]+[-+]?(0x[[:xdigit:]]+|0o[0-7]+|[[:digit:]]+(\.[[:digit:]]*)?(e[-+]?[[:digit:]]+)?|\.inf|\.nan)[[:space:]]*(#.*)?$"
+icolor green "(:|-)[[:space:]]+(true|yes|on)[[:space:]]*(#.*)?$"
+icolor red "(:|-)[[:space:]]+(false|no|off)[[:space:]]*(#.*)?$"
+icolor #59d "(:|-)[[:space:]]+(null|~)[[:space:]]*(#.*)?$"
+
+## Play and task keywords
+color #c8c "^[[:space:]]*(-[[:space:]]+)*(hosts|tasks|pre_tasks|post_tasks|handlers|roles|vars|vars_files|vars_prompt|gather_facts|gather_subset|become|become_user|become_method|become_flags|when|loop|loop_control|with_[a-z_]+|until|retries|delay|register|notify|listen|tags|block|rescue|always|ignore_errors|ignore_unreachable|changed_when|failed_when|delegate_to|delegate_facts|run_once|any_errors_fatal|max_fail_percentage|serial|strategy|environment|no_log|check_mode|diff|throttle|timeout|connection|collections|module_defaults|args|local_action|async|poll|force_handlers|order|port|remote_user|debugger):([[:space:]]|$)"
+## Modules: fully qualified (ansible.builtin.copy, community.general.ufw) and common short names
+color #dda "^[[:space:]]*(-[[:space:]]+)*[[:alnum:]_]+\.[[:alnum:]_]+\.[[:alnum:]_.]+:([[:space:]]|$)"
+color #dda "^[[:space:]]*(-[[:space:]]+)*(add_host|apt|apt_key|apt_repository|archive|assemble|assert|async_status|authorized_key|blockinfile|command|copy|cron|deb822_repository|debconf|debug|dnf|dnf5|expect|fail|fetch|file|find|firewalld|gather_facts|get_url|getent|git|group|group_by|hostname|import_playbook|import_role|import_tasks|include_role|include_tasks|include_vars|ini_file|iptables|known_hosts|lineinfile|meta|mount|package|package_facts|pause|ping|pip|raw|reboot|replace|rpm_key|script|seboolean|selinux|service|service_facts|set_fact|set_stats|setup|shell|slurp|stat|subversion|sysctl|systemd|systemd_service|tempfile|template|timezone|unarchive|uri|user|validate_argument_spec|wait_for|wait_for_connection|yum|yum_repository):([[:space:]]|$)"
+
+color normal ":([[:space:]]|$)" "^[[:space:]]*(-[[:space:]]+)+" "[][{},]"
+color #c97 "\"([^\"\\]|\\.)*\"" "'([^']|'')*'"
+color #4cb "(^|[[:space:]])[&*][[:alnum:]_.-]+" "(^|[[:space:]])![[:alnum:]!_/.:-]*"
+color #c8c ":[[:space:]]+[|>][-+0-9]*[[:space:]]*(#.*)?$"
+color normal ":[[:space:]]"
+color #888 "^(---|\.\.\.)([[:space:]]|$)"
+
+## Jinja2: {{ expressions }}, {% statements %}, {# comments #}
+##   expressions in the variable color, statements in the keyword color
+color #9df "\{\{([^}]|\}[^}])*\}\}"
+color #c8c "\{%([^%]|%[^}])*%\}"
+##   filters: {{ x | default('a') }}
+color #dda "\|[[:space:]]*[[:alpha:]_][[:alnum:]_.]*"
+##   string literals inside Jinja (single quotes, since the YAML value is usually double-quoted)
+color #c97 "'([^']|'')*'"
+##   delimiters
+color #c8c "\{\{-?|-?\}\}|\{%-?|-?%\}"
+color italic,#695 "\{#([^#]|#[^}])*#\}"
+## Warning (yellow): missing spaces inside {{ }}, e.g. {{var}}
+color bold,yellow "\{\{[^[:space:]}][^}]*\}\}" "\{\{[^}]*[^[:space:]{]\}\}"
+## Error (red): {{ or {% opened but not closed on the line
+color ,red "\{\{([^}]|\}[^}])*$" "\{%([^%]|%[^}])*$"
+
+color italic,#695 "(^|[[:space:]])#.*$"
+color ,red "^[[:space:]]*	[[:space:]]*"
+color ,red "[[:space:]]+$"
