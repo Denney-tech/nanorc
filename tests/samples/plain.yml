@@ -16,3 +16,6 @@ services:
     script: |
       echo hi
     tagged: !!str 123
+    message: "keep # this"
+    note: "x" # a real comment
+# - commented: "out"

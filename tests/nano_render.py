@@ -2,6 +2,7 @@
 """Render a file in nano through a pseudo-terminal and report each character's color.
 
     nano_render.py <nanorc> <file>      # prints the screen, then each run of text with its style
+    nano_render.py - <file>             # same, with nano's normal /etc/nanorc + ~/.nanorc
 
 As a module: render(rcfile, path) -> Screen, whose style_of(text) gives the style nano drew
 `text` in. nano draws with ncurses, so a small VT100/xterm screen model (cursor moves, erases,
@@ -241,14 +242,16 @@ class Screen:
                 yield r, run.rstrip(), style
 
 
-def render(rcfile: str, path: str, settle: float = 1.0, timeout: float = 20.0) -> Screen:
-    """Open `path` in nano using only `rcfile`, capture the drawn screen, then quit."""
+def render(rcfile, path: str, settle: float = 1.0, timeout: float = 20.0) -> Screen:
+    """Open `path` in nano using only `rcfile` (or, with rcfile None, nano's normal
+    /etc/nanorc + ~/.nanorc), capture the drawn screen, then quit."""
     pid, fd = pty.fork()
     if pid == 0:
         fcntl.ioctl(0, termios.TIOCSWINSZ, struct.pack("HHHH", ROWS, COLS, 0, 0))
         os.environ["TERM"] = "xterm-256color"
         os.environ.pop("NO_COLOR", None)
-        os.execvp("nano", ["nano", "--rcfile", rcfile, "--view", path])
+        rc_args = ["--rcfile", rcfile] if rcfile else []
+        os.execvp("nano", ["nano", *rc_args, "--view", path])
     screen = Screen()
     raw = bytearray()
     deadline = time.monotonic() + timeout
@@ -282,7 +285,7 @@ def main() -> int:
     if len(sys.argv) != 3:
         print(__doc__, file=sys.stderr)
         return 2
-    screen = render(sys.argv[1], sys.argv[2])
+    screen = render(None if sys.argv[1] == "-" else sys.argv[1], sys.argv[2])
     for line in screen.text_lines():
         if line:
             print(line)

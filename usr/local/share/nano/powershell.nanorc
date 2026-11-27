@@ -6,7 +6,7 @@
 ## Rules are applied in order, and later rules repaint earlier ones.
 
 ## --- Scripts and modules -------------------------------------------------------------------
-syntax powershell "\.(ps1|psm1)$"
+syntax powershell "\.[pP][sS]([mM])?1$"
 header "^#!.*pwsh"
 comment "#"
 
@@ -42,6 +42,9 @@ color #dda "::[[:alpha:]][[:alnum:]_]*"
 color #dda "\.[[:alpha:]][[:alnum:]_]*\("
 color normal "\("
 
+## Trailing comments, painted before strings so a "#" inside a string stays string-colored
+color italic,#695 "[[:space:]]#.*$"
+
 ## Double-quoted strings (variables inside are repainted below, as VS Code does)
 color #c97 "\"([^\"`]|`.)*\""
 color #c97 start="@\"$" end="^\"@"
@@ -61,8 +64,9 @@ icolor #59d "\$null\>"
 color #c97 "'([^']|'')*'"
 color #c97 start="@'$" end="^'@"
 
-## Comments, comment-based help keywords, #region and #Requires
-color italic,#695 "(^|[[:space:]])#.*$"
+## Whole-line comments (after strings, so commented-out code stays comment-colored), block
+## comments, comment-based help keywords, #region and #Requires
+color italic,#695 "^[[:space:]]*#.*$"
 color italic,#695 start="<#" end="#>"
 icolor bold,italic,#695 "^[[:space:]]*\.(SYNOPSIS|DESCRIPTION|PARAMETER|EXAMPLE|INPUTS|OUTPUTS|NOTES|LINK|COMPONENT|ROLE|FUNCTIONALITY|FORWARDHELPTARGETNAME|FORWARDHELPCATEGORY|REMOTEHELPRUNSPACE|EXTERNALHELP)\>"
 icolor bold,italic,#695 "^[[:space:]]*#(region|endregion)\>.*$"
@@ -74,7 +78,7 @@ color ,red "[[:space:]]+$"
 
 ## --- Data files: module manifests and .psd1 data -------------------------------------------
 ## A restricted language: hashtables and arrays of literals, so no command or keyword colors.
-syntax powershell-data "\.psd1$"
+syntax powershell-data "\.[pP][sS][dD]1$"
 comment "#"
 
 ## Keys: Name = ...

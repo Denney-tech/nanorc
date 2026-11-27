@@ -15,8 +15,10 @@ color #bca "-?\<[[:digit:]]+(\.[[:digit:]]+)?([eE][-+]?[[:digit:]]+)?\>"
 color green "\<true\>"
 color red "\<false\>"
 color #59d "\<null\>"
-## Punctuation (before strings, so a ":" inside a string keeps the string color)
+## Punctuation and trailing commas, before strings, so ":" or ",]" inside a string keeps the
+## string color
 color normal "[][{}:,]"
+color ,red ",[[:space:]]*[]}]"
 ## Strings, then keys (a string followed by a colon) in VS Code's property color
 color #c97 "\"([^\"\\]|\\.)*\""
 color #9df "\"([^\"\\]|\\.)*\"[[:space:]]*:"
@@ -24,7 +26,7 @@ color #9df "\"([^\"\\]|\\.)*\"[[:space:]]*:"
 color #c8c "\\([\"\\/bfnrt]|u[[:xdigit:]]{4})"
 ## Comments (JSONC / JSON5)
 color italic,#695 "(^|[[:space:]])//.*$"
-color italic,#695 start="/\*" end="\*/"
-## Errors: trailing comma before a closing bracket on the same line, trailing whitespace
-color ,red ",[[:space:]]*[]}]"
+## (only at line start or after a space, so "/**" inside a string isn't a comment)
+color italic,#695 start="(^|[[:space:]])/\*" end="\*/"
+## Errors: trailing whitespace
 color ,red "[[:space:]]+$"

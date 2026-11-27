@@ -8,6 +8,7 @@ that loads nano's bundled syntaxes first and this repo's second, as /etc/nanorc 
 so the tests also prove these syntaxes override the bundled yaml/json ones.
 """
 import os
+import re
 import shutil
 import sys
 import tempfile
@@ -20,7 +21,10 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
 SYNTAX_DIR = os.path.join(REPO, "usr", "local", "share", "nano")
 SAMPLES = os.path.join(HERE, "samples")
-BUNDLED = "/usr/share/nano"
+BUNDLED = os.environ.get("NANO_BUNDLED_SYNTAX_DIR", "/usr/share/nano")
+OVERRIDDEN = ("yaml.nanorc", "json.nanorc")  # bundled syntaxes this repo replaces
+# nano's messages for a bad rc file, shown in the status line
+RC_ERRORS = re.compile(r"Mistakes in|Error in|not understood|Unknown|Bad regex")
 
 # The palette (README.md): VS Code Dark+ hues plus Ansible-style status colors.
 PALETTE = {
@@ -65,10 +69,16 @@ class Highlighting(unittest.TestCase):
             raise unittest.SkipTest("nano is not installed")
         cls.work = tempfile.mkdtemp(prefix="nanorc-test-")
         cls.styles = calibrate(cls.work)
+        # Copy the samples to a neutral path: syntax selection looks at the whole path, so a
+        # checkout under e.g. ~/ansible-work/ would otherwise pick the Ansible syntax for plain.yml.
+        cls.samples = os.path.join(cls.work, "samples")
+        shutil.copytree(SAMPLES, cls.samples)
+        shutil.copy(os.path.join(cls.samples, "sample.ps1"), os.path.join(cls.samples, "UPPER.PS1"))
+        cls.bundled = all(os.path.isfile(os.path.join(BUNDLED, name)) for name in OVERRIDDEN)
         cls.rc = os.path.join(cls.work, "system.rc")
         with open(cls.rc, "w") as f:
-            if os.path.isdir(BUNDLED):
-                f.write(f'include "{BUNDLED}/*.nanorc"\n')
+            if cls.bundled:
+                f.write(f'include "{BUNDLED}/*.nanorc"\n')  # first, as /etc/nanorc does
             f.write(f'include "{SYNTAX_DIR}/*.nanorc"\n')
         cls.screens = {}
 
@@ -78,7 +88,7 @@ class Highlighting(unittest.TestCase):
 
     def screen(self, sample):
         if sample not in self.screens:
-            self.screens[sample] = nano_render.render(self.rc, os.path.join(SAMPLES, sample))
+            self.screens[sample] = nano_render.render(self.rc, os.path.join(self.samples, sample))
         return self.screens[sample]
 
     def check(self, sample, expectations):
@@ -100,11 +110,32 @@ class Highlighting(unittest.TestCase):
         fg_only = {k: v for k, v in self.styles.items() if k not in ("invalid", "directive", "help")}
         self.assertEqual(len(set(fg_only.values())), len(fg_only), self.styles)
 
+    @staticmethod
+    def status_line(screen):
+        return screen.text_lines()[nano_render.ROWS - 3]
+
     def test_syntax_files_load_without_errors(self):
         for sample in ("sample.ps1", "Sample.psd1", "plain.yml", "roles/demo/tasks/main.yml", "sample.json"):
             with self.subTest(sample=sample):
-                status = [line for line in self.screen(sample).text_lines() if "rror" in line or "nknown" in line]
-                self.assertEqual([], status)
+                self.assertIsNone(RC_ERRORS.search(self.status_line(self.screen(sample))), self.status_line(self.screen(sample)))
+
+    def test_rc_error_detection_works(self):
+        bad = os.path.join(self.work, "bad.rc")
+        with open(bad, "w") as f:
+            f.write('syntax bad "\\.ps1$"\ncolor nosuchcolor "x"\n')
+        status = self.status_line(nano_render.render(bad, os.path.join(self.samples, "sample.ps1")))
+        self.assertRegex(status, RC_ERRORS)
+
+    def test_overrides_bundled_syntaxes(self):
+        if not self.bundled:
+            self.skipTest(f"nano's bundled {' and '.join(OVERRIDDEN)} not found in {BUNDLED} "
+                          "(set NANO_BUNDLED_SYNTAX_DIR); can't prove the override")
+        # With the bundled files loaded first, these come from this repo's syntaxes.
+        self.assertEqual(self.styles["declaration"], self.screen("plain.yml").style_of("services"))
+        self.assertEqual(self.styles["variable"], self.screen("sample.json").style_of('"name":'))
+
+    def test_uppercase_powershell_extension(self):
+        self.assertEqual(self.styles["command"], self.screen("UPPER.PS1").style_of("Get-ChildItem"))
 
     def test_powershell(self):
         self.check("sample.ps1", [
@@ -129,6 +160,7 @@ class Highlighting(unittest.TestCase):
             ('"Found', "string"),
             ("$Count", "variable", 2),          # inside a double-quoted string
             ("${Path}", "variable"),
+            ('"Issue #1"', "string"),         # "#" inside a string is not a comment
             ("[Math]", "type"),
             ("::Round", "command"),
             ("$null", "declaration"),
@@ -165,6 +197,10 @@ class Highlighting(unittest.TestCase):
             ("*base", "type"),
             ("|", "control"),
             ("!!str", "type"),
+            ('"keep # this"', "string"),
+            ('"x"', "string", 'note: "x"'),
+            ("# a real comment", "comment"),
+            ('# - commented: "out"', "comment"),   # commented-out lines stay comments
         ])
 
     def test_ansible(self):
@@ -186,6 +222,7 @@ class Highlighting(unittest.TestCase):
             ("debug", "command"),
             ("{{dnf_result}}", "warning"),
             ("{% if x %}", "control"),
+            ('"Item #1"', "string"),
         ])
         unclosed = self.screen("roles/demo/tasks/main.yml").style_of('{{ oops"')
         self.assertEqual(self.styles["invalid"].bg, unclosed.bg)
@@ -200,8 +237,11 @@ class Highlighting(unittest.TestCase):
             ("null", "declaration"),
             ('"C:', "string"),                # a ":" inside a string stays string-colored
             ("\\n", "control"),
+            ('"/**"', "string"),              # not the start of a block comment
+            ("true", "ok", '"enabled": true'),  # ...so later lines aren't comment-colored
+            ('",]"', "string"),               # not a trailing comma
         ])
-        self.assertEqual(self.styles["invalid"].bg, self.screen("sample.json").style_of(",]").bg)
+        self.assertEqual(self.styles["invalid"].bg, self.screen("sample.json").style_of(",]", within="3,]").bg)
 
 
 if __name__ == "__main__":

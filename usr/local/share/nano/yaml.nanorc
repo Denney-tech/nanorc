@@ -26,6 +26,8 @@ icolor #59d "(:|-)[[:space:]]+(null|~)[[:space:]]*(#.*)?$"
 ## Punctuation
 color normal ":([[:space:]]|$)" "^[[:space:]]*(-[[:space:]]+)+" "[][{},]"
 ## Quoted strings
+## Trailing comments, painted before quoted strings so "Item #1" stays a string
+color italic,#695 "[[:space:]]#.*$"
 color #c97 "\"([^\"\\]|\\.)*\"" "'([^']|'')*'"
 ## Anchors, aliases and tags
 color #4cb "(^|[[:space:]])[&*][[:alnum:]_.-]+" "(^|[[:space:]])![[:alnum:]!_/.:-]*"
@@ -34,8 +36,8 @@ color #c8c ":[[:space:]]+[|>][-+0-9]*[[:space:]]*(#.*)?$"
 color normal ":[[:space:]]"
 ## Document markers and directives
 color #888 "^(---|\.\.\.)([[:space:]]|$)" "^%.*$"
-## Comments
-color italic,#695 "(^|[[:space:]])#.*$"
+## Whole-line comments, after strings, so commented-out lines stay comment-colored
+color italic,#695 "^[[:space:]]*#.*$"
 ## Errors: tabs in indentation (not allowed in YAML) and trailing whitespace
 color ,red "^[[:space:]]*	[[:space:]]*"
 color ,red "[[:space:]]+$"
@@ -62,6 +64,8 @@ color #dda "^[[:space:]]*(-[[:space:]]+)*[[:alnum:]_]+\.[[:alnum:]_]+\.[[:alnum:
 color #dda "^[[:space:]]*(-[[:space:]]+)*(add_host|apt|apt_key|apt_repository|archive|assemble|assert|async_status|authorized_key|blockinfile|command|copy|cron|deb822_repository|debconf|debug|dnf|dnf5|expect|fail|fetch|file|find|firewalld|gather_facts|get_url|getent|git|group|group_by|hostname|import_playbook|import_role|import_tasks|include_role|include_tasks|include_vars|ini_file|iptables|known_hosts|lineinfile|meta|mount|package|package_facts|pause|ping|pip|raw|reboot|replace|rpm_key|script|seboolean|selinux|service|service_facts|set_fact|set_stats|setup|shell|slurp|stat|subversion|sysctl|systemd|systemd_service|tempfile|template|timezone|unarchive|uri|user|validate_argument_spec|wait_for|wait_for_connection|yum|yum_repository):([[:space:]]|$)"
 
 color normal ":([[:space:]]|$)" "^[[:space:]]*(-[[:space:]]+)+" "[][{},]"
+## Trailing comments, painted before quoted strings so "Item #1" stays a string
+color italic,#695 "[[:space:]]#.*$"
 color #c97 "\"([^\"\\]|\\.)*\"" "'([^']|'')*'"
 color #4cb "(^|[[:space:]])[&*][[:alnum:]_.-]+" "(^|[[:space:]])![[:alnum:]!_/.:-]*"
 color #c8c ":[[:space:]]+[|>][-+0-9]*[[:space:]]*(#.*)?$"
@@ -84,6 +88,7 @@ color bold,yellow "\{\{[^[:space:]}][^}]*\}\}" "\{\{[^}]*[^[:space:]{]\}\}"
 ## Error (red): {{ or {% opened but not closed on the line
 color ,red "\{\{([^}]|\}[^}])*$" "\{%([^%]|%[^}])*$"
 
-color italic,#695 "(^|[[:space:]])#.*$"
+## Whole-line comments, after strings, so commented-out tasks stay comment-colored
+color italic,#695 "^[[:space:]]*#.*$"
 color ,red "^[[:space:]]*	[[:space:]]*"
 color ,red "[[:space:]]+$"

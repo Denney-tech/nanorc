@@ -5,5 +5,7 @@
   "debug": false,
   "parent": null,
   "path": "C:\\temp\n",
+  "pattern": "/**",
+  "text": ",]",
   "list": [1, 2, 3,]
 }

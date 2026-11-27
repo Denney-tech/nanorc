@@ -20,4 +20,5 @@
     msg: "bad spacing {{dnf_result}} and {% if x %}yes{% endif %}"
   vars:
     retries: 3
+    label: "Item #1"
     unclosed: "{{ oops"
